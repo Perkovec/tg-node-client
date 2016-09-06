@@ -1,16 +1,23 @@
-const fs = require('fs');
+const {Socket} = require('net');
+const {randomBytes} = require('crypto');
 
 const api_id = 44026;
 const api_hash = "e864dc7132da460ffdc67c1b7cf66e1e";
 
 class MTProto {
-  constructor(authkeyfile) {
-    try {
-      fs.accessSync(authkeyfile, fs.F_OK);
-    // Do something
-    } catch (e) {
-    // It isn't accessible
-    }
+  constructor(ip, port, auth_key = null, /*???*/ server_salt = null) {
+    this.sock = new Socket();
+    this.sock.connect(port, ip);
+    this.number = 0;
+    this.timedelta = 0;
+    randomBytes(48, (err, buffer) => {
+      this.session_id = buffer;
+    });
+    this.auth_key = auth_key;
+    this.auth_key_id = ''; // TODO
+    this.sock.setTimeout(5);
+    this.MAX_RETRY = 5;
+    this.AUTH_MAX_RETRY = 5;
   }
 }
 
